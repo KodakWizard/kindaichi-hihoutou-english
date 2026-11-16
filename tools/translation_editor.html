@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kindaichi Translation Editor</title>
+<style>
+:root {color-scheme:dark; font:16px/1.5 Inter, "Segoe UI",sans-serif; background:#121519;color:#ece9df}
+* {box-sizing:border-box}
+body {margin:0}
+header,main {max-width:1440px;margin:auto;padding:22px 30px}
+header {border-bottom:1px solid #32363c}
+header a {color:#e5c484;font-size:14px}
+h1 {margin:0;font-size:24px;letter-spacing:-.02em}
+h2 {font-size:18px;margin:0 0 14px}
+main.has-transcript {grid-template-columns:minmax(200px,270px) minmax(320px,1fr) minmax(250px,380px)}
+#transcript {position:sticky;top:16px;align-self:start}
+#transcriptRows {display:grid;gap:6px;max-height:min(72vh,960px);overflow:auto;margin-top:12px}
+#transcriptRows button {width:100%;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere}
+#transcriptRows strong {display:block;color:#e5c484;font-size:13px}
+@media(max-width:1050px) {main.has-transcript {grid-template-columns:1fr 2fr} #transcript {grid-column:1/-1;position:static}}
+main {display:grid;grid-template-columns:minmax(270px, 360px) minmax(0, 1fr);gap:24px}
+aside,article {background:#1b1f24;border:1px solid #343a40;border-radius:12px;padding:16px;min-width:0}
+label {display:block;margin:8px 0 4px;color:#d1d6d5;font-size:14px}
+input, select, textarea, button {font:inherit;color:inherit;background:#121519;border:1px solid #484e56;border-radius:6px;padding:8px 10px}
+input, select, textarea {width:100%}
+textarea {resize:vertical;min-height:120px}
+button {cursor:pointer}
+button:hover:not(:disabled) {border-color:#d6b375}
+button:disabled {opacity:.5;cursor:default}
+button.primary {background:#e5c484;color:#211a11;border-color:#e5c484}
+.filters,.pager,.actions {display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.filters > label {flex:1;min-width:95px}
+#entries {display:grid;gap:4px;margin:12px 0;max-height:56vh;overflow:auto}
+.entry {text-align:left;padding:9px;overflow:hidden}
+.entry[aria-current=true] {border-color:#e5c484;background:#29251e}
+.snippet {display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+small,.meta {color:#aeb7be;font-size:13px;overflow-wrap:anywhere}
+pre {font:inherit;white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0;padding:12px;background:#121519;border-radius:6px}
+details {margin-top:16px}
+summary {cursor:pointer}
+#notice {color:#e5c484;min-height:24px;margin:8px 0;overflow-wrap:anywhere}
+.history-item {margin:10px 0}
+[hidden] {display:none !important}
+#previewPages {display:flex;flex-wrap:wrap;gap:10px}
+.page-card {background:#08090b;border:1px solid #3a4048;padding:12px;border-radius:8px;min-width:240px}
+.page-card pre {background:none;min-height:5.5em;margin:0;padding:6px 0}
+#graphicImage {display:block;max-width:100%;image-rendering:pixelated;background:repeating-conic-gradient(#393e44 0% 25%,#252a30 0% 50%) 0 0 / 16px 16px;margin-top:16px}
+.graphic-pair {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.graphic-pair img {max-width:100%;display:block;image-rendering:pixelated;background:#333}
+#replaceResults {white-space:pre-wrap;max-height:25em;overflow:auto}
+#graphicsPanel,#buildPanel,#extractPanel {grid-column:1/-1}
+#textureList {min-height:220px}
+a {color:#e5c484}
+@media(max-width:760px) {main,main.has-transcript {grid-template-columns:1fr} header,main {padding:14px} #entries {max-height:32vh}}
+</style>
+<header><h1>Kindaichi Translation Editor</h1><nav class="actions"><button id="textTab">Story &amp; choices</button><button id="graphicsTab">Graphics</button><button id="extractTab">Extract original disc</button><button id="buildTab">Build &amp; patch</button><a href="/drafts.jsonl" download="drafts.jsonl">Export drafts</a></nav></header>
+<main id="workspace">
+<aside id="textList">
+  <h2>Entries</h2>
+  <label for="q">Search Japanese, English or ID</label>
+  <input id="q" type="search" autocomplete="off">
+  <label for="scene">Scene</label><select id="scene"><option value="">All scenes</option></select>
+  <div class="filters">
+    <label>Order<select id="order"><option value="script">Opening, then script order</option><option value="file">File name, then script order</option></select></label>
+    <label>Continuation<select id="short"><option value="">Any page length</option><option value="1">1 word</option><option value="2">1–2 words</option><option value="3">1–3 words</option></select></label>
+  </div>
+  <details id="replacePanel"><summary>Search and replace</summary>
+    <label>Find in build English<input id="replaceFrom"></label>
+    <label>Replace with<input id="replaceTo"></label>
+    <label><input id="replaceWhole" type="checkbox" style="width:auto" checked> Whole words</label>
+    <label><input id="replaceCase" type="checkbox" style="width:auto"> Match case</label>
+    <p class="meta">Uses the selected file, scene and text type.</p>
+    <div class="actions"><button id="replacePreview">Preview changes</button><button id="replaceApply" disabled>Apply and approve</button></div>
+    <pre id="replaceResults" aria-live="polite" hidden></pre>
+  </details>
+  <label for="path">Source file</label><select id="path"><option value="">All files</option></select>
+  <div class="filters">
+    <label>Type<select id="kind"><option value="">All types</option><option value="dialogue">Dialogue</option><option value="choice">Choice</option><option value="speaker">Speaker</option><option value="system">System</option></select></label>
+    <label>Status<select id="status"><option value="">All statuses</option><option>In build</option><option>Untranslated</option><option>Draft</option><option>Approved</option></select></label>
+  </div>
+  <div id="entries"></div>
+  <div class="pager"><button id="back">Previous</button><button id="forward">Next</button><span id="count" class="meta" aria-live="polite"></span></div>
+</aside>
+<article id="textEditor">
+  <h2 id="title">Select an entry</h2>
+  <p id="notice" role="status"></p>
+  <section id="editor" hidden>
+    <div id="meta" class="meta"></div>
+    <label>Japanese source</label><pre id="jp" lang="ja"></pre>
+    <label for="english">English translation</label><textarea id="english" spellcheck="true" aria-describedby="revisionStatus"></textarea>
+    <span class="meta" id="charCount"></span><p id="revisionStatus" class="meta"></p>
+    <section id="livePreview"><h2>Page preview</h2><p class="meta" id="previewNotice" role="status"></p><div id="previewPages"></div></section>
+    <label for="notes">Review notes</label><input id="notes">
+    <div class="actions"><button id="draft" class="primary">Save draft</button><button id="approve">Approve for build</button></div>
+    <nav class="actions" aria-label="Dialogue navigation" id="dialogueNav">
+      <button type="button" id="previousDialogue">Previous dialogue</button>
+      <button type="button" id="nextDialogue">Next dialogue</button>
+    </nav>
+    <details><summary>Conversation context</summary><div id="context"></div></details>
+    <details><summary>Revision history and legacy translations</summary><div id="history"></div></details>
+  </section>
+</article>
+<aside id="transcript" hidden aria-labelledby="transcriptTitle">
+  <h2 id="transcriptTitle">Scene transcript</h2>
+  <div id="transcriptMeta" class="meta" role="status"></div>
+  <div id="transcriptRows"></div>
+</aside>
+<article id="graphicsPanel" hidden>
+  <h2>Graphics library</h2>
+  <label for="textureSearch">Search texture filenames</label><input id="textureSearch" type="search" placeholder="Search MEMO, ATREN, map…">
+  <label for="textureList">Texture files</label><select id="textureList" size="8"></select>
+  <div class="filters">
+    <label>Page<select id="texturePage"></select></label>
+    <label>Bit depth<select id="textureDepth"><option>4</option><option>8</option></select></label>
+    <label>Palette file<select id="paletteFile"></select></label>
+    <label>Palette<select id="paletteIndex"></select></label>
+  </div>
+  <div class="graphic-pair" id="graphicCompare" hidden>
+    <div><strong>Original</strong><img id="originalGraphic" alt="Original texture"></div>
+    <div><strong>Current</strong><img id="graphicImage" alt="Current texture with queued edits"></div>
+  </div>
+  <div class="actions"><a id="exportPng" download hidden>Export indexed PNG</a>
+    <label>Import edited indexed PNG<input id="importPng" type="file" accept="image/png"></label>
+  </div>
+  <p class="meta" id="graphicsNotice" role="status">Select a texture. Keep the exported PNG indexed and preserve its dimensions and palette order when editing.</p>
+</article>
+<article id="extractPanel" hidden>
+  <h2>Extract original disc</h2>
+  <p>Extract the Japanese scripts, graphics and system files into a new folder in Output.</p>
+  <label for="discPath">Path to the original CUE or raw BIN</label><input id="discPath" placeholder="Paste the full file path">
+  <div class="actions"><button id="extract" class="primary">Extract files</button></div>
+  <p class="meta" id="extractStatus" role="status"></p>
+</article>
+<article id="buildPanel" hidden>
+  <h2>Build &amp; patch</h2>
+  <p>Build a new BIN/CUE from approved text and queued images. Save your edits before building.</p>
+  <label for="cleanDisc">Clean SLPS-00601 CUE or BIN path (optional)</label>
+  <input id="cleanDisc" placeholder="Paste the full path to also export a standalone patch">
+  <button id="build" class="primary">Build game and export patch</button>
+  <div class="actions"><a href="/translation.json" download="translation-archive.json">Download full translation archive</a>
+    <a href="/translation.json?blank=1" download="translation-template.json">Download blank translation template</a></div>
+  <label for="importPatch">Build from a translation archive or saved editor patch</label><input type="file" id="importPatch" accept=".json,.kindaichi-patch">
+  <p class="meta">Leave this empty to build from the editor. A translation archive must fill all dialogue and choices.</p>
+  <p id="buildStatus" role="status"></p><pre id="buildLog" hidden></pre>
+  <a id="patchLink" download hidden>Download editor patch</a>
+  <a id="releaseLink" download hidden>Download standalone clean-disc patch</a>
+  <p class="meta">Editor patches contain your saved changes and use this Kindaichi project to rebuild the disc.</p>
+</article>
+</main>
+<script>
+const byId = id => document.getElementById(id);
+let portable = false, activeTab = 'text';
+const english = byId('english'), notes = byId('notes');
+let page = 0, current = null, original = [], generation = 0, timer, opening = 0, saving = false;
+const setNotice = message => { byId('notice').textContent = message; };
+const dirty = () => current && (english.value !== original[0] || notes.value !== original[1]);
+function element(tag, value, className) {
+  const node = document.createElement(tag);
+  node.textContent = value;
+  if (className) node.className = className;
+  return node;
+}
+async function api(path, payload) {
+  const response = await fetch(path, payload ? {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+  } : {});
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+async function loadList() {
+  const ticket = ++generation;
+  const query = new URLSearchParams({page});
+  for (const id of ['q','path','kind','status','scene','order','short']) query.set(id, byId(id).value);
+  const {rows,total} = await api('/entries?' + query);
+  if (ticket !== generation) return;
+  if (!rows.length && page && total) {
+    page = Math.floor((total - 1) / 40);
+    return loadList();
+  }
+  byId('count').textContent = total ? (page * 40 + 1) + '–' + (page * 40 + rows.length) + ' of ' + total : 'No matches';
+  byId('back').disabled = page === 0;
+  byId('forward').disabled = (page + 1) * 40 >= total;
+  const list = byId('entries');
+  list.replaceChildren();
+  for (const row of rows) {
+    const button = element('button', '', 'entry');
+    button.setAttribute('aria-current', String(current?.source.id === row.id));
+    button.append(element('span', (row.english || row.jp).replaceAll('\n',' '), 'snippet'),
+                  element('small', row.path + (row.scene ? ' · Scene ' + row.scene : '') + (row.speaker != null ? ' · Character #' + row.speaker : '') + ' · ' + row.kind + ' · ' + row.status));
+    button.onclick = () => openEntry(row.id).catch(error => setNotice(error.message));
+    list.append(button);
+  }
+}
+function show(data) {
+  current = data;
+  const row = data.source, latest = data.history[0];
+  byId('editor').hidden = false;
+  byId('title').textContent = (data.context.speaker || row.kind) + (row.scene ? ' · Scene ' + row.scene : '');
+  byId('meta').textContent = row.id + (row.speaker == null ? '' : ' · Character #' + row.speaker) + ' · ' + row.size + ' source bytes';
+  byId('jp').textContent = row.jp;
+  english.value = latest?.text || data.baseline || row.baseline_en || '';
+  notes.value = latest?.note || '';
+  const approved = data.history.find(item => item.status === 'approved');
+  byId('revisionStatus').textContent = latest
+    ? 'Editing revision #' + latest.number + ' (' + latest.status + '). ' +
+      (approved ? 'Build uses approved revision #' + approved.number + '.' : 'Build uses the existing translation.')
+    : (data.baseline ? 'Showing the current build translation.' : row.baseline_en ? 'Showing the baseline speaker name.' : 'No saved translation.');
+  original = [english.value, notes.value];
+  updatePreview();
+  byId('approve').disabled = portable || !['dialogue', 'choice'].includes(row.kind);
+  const context = byId('context');
+  context.replaceChildren();
+  const storyEntry = ['dialogue', 'choice'].includes(row.kind);
+  byId('dialogueNav').hidden = !storyEntry;
+  for (const direction of ['previous', 'next']) {
+    const key = data.context[direction], button = byId(direction + 'Dialogue');
+    button.disabled = !key;
+    button.onclick = key ? () => openEntry(key).catch(error => setNotice(error.message)) : null;
+  }
+  const branch = [...(row.branch || []), row.choice_branch].filter(Boolean);
+  if (branch.length) context.append(element('pre',branch.join('\n')));
+  context.parentElement.hidden = !branch.length;
+  updateTranscript(row);
+  const history = byId('history');
+  history.replaceChildren();
+  for (const item of [...data.history, ...data.legacy]) {
+    const block = element('div','','history-item');
+    block.append(element('small', item.number ? '#' + item.number + ' · ' + item.status + ' · ' + item.model : item.id + ' · legacy'),
+                 element('pre',item.text || item.en_text || ''));
+    if (item.note) block.append(element('div',item.note,'meta'));
+    const use = element('button','Use text');
+    use.onclick = () => { english.value = item.text || item.en_text || ''; english.focus(); updatePreview(); };
+    block.append(use);
+    history.append(block);
+  }
+  if (!history.childNodes.length) history.append(element('p','No revisions yet.','meta'));
+}
+function setTranscriptVisible(visible) {
+  byId('transcript').hidden = !visible;
+  byId('workspace').classList.toggle('has-transcript', visible);
+}
+async function updateTranscript(row) {
+  const visible = ['dialogue','choice'].includes(row.kind);
+  setTranscriptVisible(visible && activeTab === 'text');
+  if (!visible) return;
+  const list = byId('transcriptRows'), meta = byId('transcriptMeta');
+  const rowsKey = row.scene_id || row.path;
+  if (list.dataset.scene !== rowsKey) list.replaceChildren();
+  meta.textContent = 'Loading scene…';
+  try {
+    const data = await api('/transcript?' + new URLSearchParams({id:row.id}));
+    if (current?.source !== row) return;
+    byId('transcriptTitle').textContent = data.scene ? 'Scene ' + data.scene : 'Scene transcript';
+    meta.textContent = data.path + ' · Script order, including alternate branches';
+    const nodes = [];
+    let active;
+    let previousBranch = '';
+    for (const line of data.entries) {
+      const branch = [...line.branch, line.choice_branch].filter(Boolean).join(' / ');
+      if (branch !== previousBranch) {
+        nodes.push(element('div', branch || 'Shared dialogue', 'meta'));
+        previousBranch = branch;
+      }
+      const label = line.kind === 'choice' ? 'Choice' : line.speaker ||
+        (line.speaker_number ? 'Character #' + line.speaker_number : 'Narration');
+      const button = element('button','','entry');
+      button.type = 'button';
+      button.append(element('strong',label),element('span',line.text));
+      button.setAttribute('aria-current', String(line.id === row.id));
+      button.onclick = () => openEntry(line.id).catch(error => setNotice(error.message));
+      nodes.push(button);
+      if (line.id === row.id) active = button;
+    }
+    list.replaceChildren(...nodes);
+    list.dataset.scene = rowsKey;
+    if (active) list.scrollTop += active.getBoundingClientRect().top -
+      list.getBoundingClientRect().top - (list.clientHeight - active.offsetHeight) / 2;
+  } catch (error) {
+    if (current?.source === row) meta.textContent = error.message;
+  }
+}
+async function openEntry(key) {
+  if (saving || (dirty() && !confirm('Discard unsaved edits?'))) return;
+  const ticket = ++opening;
+  const result = await api('/entry?' + new URLSearchParams({id:key}));
+  if (ticket !== opening || saving) return;
+  show(result);
+  setNotice('');
+  await loadList();
+}
+async function save(status) {
+  if (saving || !current) return;
+  opening++;
+  saving = true;
+  english.readOnly = notes.readOnly = true;
+  byId('draft').disabled = byId('approve').disabled = true;
+  try {
+    const result = await api('/entry',{id:current.source.id, revision:current.history[0]?.number ?? null,
+                                     text:english.value, note:notes.value, status});
+    show(result);
+    setNotice(result.warning ? 'Draft saved. ' + result.warning : (status === 'draft' ? 'Draft saved.' : 'Approved for build.'));
+    await loadList();
+  } catch (error) {
+    setNotice(error.message);
+  } finally {
+    saving = false;
+    english.readOnly = notes.readOnly = false;
+    byId('draft').disabled = false;
+    byId('approve').disabled = portable || !['dialogue', 'choice'].includes(current.source.kind);
+  }
+}
+const refresh = () => loadList().catch(error => setNotice(error.message));
+byId('q').oninput = () => { page = 0; clearTimeout(timer); timer = setTimeout(refresh, 180); };
+for (const id of ['path','kind','status','scene','order','short']) byId(id).onchange = () => { page = 0; refresh(); };
+byId('back').onclick = () => { page--; refresh(); };
+byId('forward').onclick = () => { page++; refresh(); };
+byId('draft').onclick = () => save('draft');
+byId('approve').onclick = () => save('approved');
+window.addEventListener('beforeunload', event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });
+let previewTicket = 0, previewTimer;
+function updatePreview() {
+  byId('charCount').textContent = [...english.value].length + ' characters';
+  const ticket = ++previewTicket;
+  clearTimeout(previewTimer);
+  byId('previewPages').replaceChildren();
+  byId('previewNotice').textContent = '';
+  if (portable || !current || !english.value.trim() || !['dialogue','choice'].includes(current.source.kind)) return;
+  previewTimer = setTimeout(async () => {
+    try {
+      const result = await api('/preview', {id:current.source.id,text:english.value});
+      if (ticket !== previewTicket) return;
+      byId('previewNotice').textContent = result.error || (result.pages.length
+        ? result.pages.length + (result.pages.length === 1 ? ' page' : ' pages') : 'Choice text passed insertion checks.');
+      result.pages.forEach((page, i) => {
+        const card = element('section','','page-card');
+        card.append(element('small','Page ' + (i + 1)),element('pre',page.lines.join('\n')));
+        if (i && page.words <= 3) card.append(element('small','Short continuation · ' + page.words + (page.words === 1 ? ' word' : ' words')));
+        byId('previewPages').append(card);
+      });
+    } catch (error) {
+      if (ticket === previewTicket) byId('previewNotice').textContent = error.message;
+    }
+  }, 150);
+}
+english.oninput = updatePreview;
+let assets, graphicTicket = 0;
+const graphicNotice = value => { byId('graphicsNotice').textContent = value; };
+function fillOptions(id, entries) {
+  byId(id).replaceChildren(...entries.map(([label,value]) => new Option(label,value)));
+}
+function refreshTextures() {
+  const query = byId('textureSearch').value.toLowerCase();
+  const old = byId('textureList').value;
+  fillOptions('textureList', [...assets.sheets, ...assets.textures].filter(path => path.toLowerCase().includes(query))
+    .map(path => [path.startsWith('sheet:') ? path.slice(6) + ' (assembled)' : path,path]));
+  if (old) byId('textureList').value = old;
+}
+async function setPalette(preferred = '') {
+  const palette = byId('paletteFile').value;
+  const widths = palette ? await api('/palette?' + new URLSearchParams({path:palette})) : [];
+  if (palette !== byId('paletteFile').value) return;
+  const depth = Number(byId('textureDepth').value);
+  fillOptions('paletteIndex', widths.flatMap((width,i) => width === 2 ** depth ? [['Palette ' + i,i]] : []));
+  if (preferred !== '') byId('paletteIndex').value = preferred;
+  await renderGraphic();
+}
+function textureParams() {
+  return {path:byId('textureList').value,page:byId('texturePage').value,depth:byId('textureDepth').value};
+}
+async function renderGraphic() {
+  const params = textureParams();
+  const ticket = ++graphicTicket;
+  byId('graphicCompare').hidden = byId('exportPng').hidden = true;
+  if (!params.path || params.page === '') return;
+  if (byId('paletteIndex').value !== '') {
+    params.palette_path = byId('paletteFile').value;
+    params.palette = byId('paletteIndex').value;
+  }
+  const url = '/texture.png?' + new URLSearchParams(params);
+  const responses = await Promise.all([fetch(url + '&original=1'), fetch(url)]);
+  if (ticket !== graphicTicket) return;
+  for (const response of responses) if (!response.ok) throw new Error((await response.json()).error);
+  const blobs = await Promise.all(responses.map(response => response.blob()));
+  if (ticket !== graphicTicket) return;
+  ['originalGraphic','graphicImage'].forEach((id,index) => {
+    const image = byId(id);
+    if (image.src.startsWith('blob:')) URL.revokeObjectURL(image.src);
+    image.src = URL.createObjectURL(blobs[index]);
+  });
+  const link = byId('exportPng');
+  link.href = byId('graphicImage').src;
+  link.download = params.path.split('/').at(-1).replace('sheet:','') + '-page-' + params.page + '.png';
+  byId('graphicCompare').hidden = link.hidden = false;
+}
+byId('textureSearch').oninput = () => { refreshTextures(); renderGraphic().catch(error => graphicNotice(error.message)); };
+byId('textureList').onchange = async () => {
+  const path = byId('textureList').value;
+  try {
+    const info = await api('/graphic?' + new URLSearchParams({path}));
+    if (path !== byId('textureList').value) return;
+    fillOptions('texturePage', Array.from({length:info.pages}, (_,i) => ['Page ' + (i + 1),i]));
+    byId('textureDepth').value = info.depth;
+    byId('paletteFile').value = info.palette_path;
+    byId('textureDepth').disabled = !!info.assembled;
+    await setPalette(info.palette);
+    graphicNotice('Confirm the palette and bit depth before saving an edit.');
+  } catch (error) { graphicNotice(error.message); }
+};
+byId('texturePage').onchange = () => renderGraphic().catch(error => graphicNotice(error.message));
+byId('textureDepth').onchange = byId('paletteFile').onchange = () => setPalette().catch(error => graphicNotice(error.message));
+byId('paletteIndex').onchange = byId('texturePage').onchange;
+byId('importPng').onchange = event => {
+  const file = event.target.files[0], params = textureParams();
+  if (!file || !params.path || params.page === '') return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      await api('/graphic', {...params,png:reader.result.split(',')[1]});
+      await renderGraphic();
+      graphicNotice('Graphic saved for the next build.');
+    } catch (error) { graphicNotice(error.message); }
+    event.target.value = '';
+  };
+  reader.readAsDataURL(file);
+};
+async function tab(name) {
+  activeTab = name;
+  byId('textList').hidden = byId('textEditor').hidden = name !== 'text';
+  setTranscriptVisible(name === 'text' && ['dialogue','choice'].includes(current?.source.kind));
+  byId('graphicsPanel').hidden = name !== 'graphics';
+  byId('buildPanel').hidden = name !== 'build';
+  byId('extractPanel').hidden = name !== 'extract';
+  if (name === 'graphics' && !assets) {
+    assets = await api('/graphics');
+    fillOptions('paletteFile',[['Grayscale indices',''],...assets.palettes.map(path => [path,path])]);
+    refreshTextures();
+  }
+}
+byId('textTab').onclick = () => tab('text');
+byId('graphicsTab').onclick = () => tab('graphics').catch(error => graphicNotice(error.message));
+byId('extractTab').onclick = () => tab('extract');
+byId('extract').onclick = async () => {
+  const button = byId('extract'), status = byId('extractStatus');
+  const path = byId('discPath').value.trim();
+  if (!path) { status.textContent = 'Paste the path to the original CUE or BIN.'; return; }
+  button.disabled = true;
+  try {
+    const {id} = await api('/extract', {path});
+    let job;
+    do {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      job = await api('/job?' + new URLSearchParams({id}));
+      status.textContent = job.log;
+    } while (job.status === 'running');
+    if (job.location) status.textContent += ' ' + job.location;
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; }
+};
+byId('buildTab').onclick = () => tab('build');
+byId('build').onclick = async () => {
+  const button = byId('build'), status = byId('buildStatus'), log = byId('buildLog'), link = byId('patchLink');
+  if (dirty()) { status.textContent = 'Save or discard the open text edit before building.'; return; }
+  const release = byId('releaseLink');
+  button.disabled = true; link.hidden = release.hidden = true;
+  status.textContent = 'Building and checking the disc…';
+  try {
+    const file = byId('importPatch').files[0];
+    let patch;
+    if (file) {
+      patch = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(file);
+      });
+    }
+    const clean = byId('cleanDisc').value.trim() || undefined;
+    const {id} = await api('/build', {patch, clean});
+    let job;
+    do {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      job = await api('/job?' + new URLSearchParams({id}));
+      log.hidden = !job.log; log.textContent = job.log;
+    } while (job.status === 'running');
+    if (job.status !== 'complete') throw new Error('Build stopped. Review the validation messages below.');
+    status.textContent = 'Build complete. Open ' + job.cue + ' from your project folder.';
+    link.href = '/patch?' + new URLSearchParams({id});
+    link.download = job.patch.split('/').at(-1);
+    link.hidden = false;
+    if (job.release) {
+      release.href = '/release?' + new URLSearchParams({id});
+      release.download = job.release.split(/[/\\]/).at(-1);
+      release.hidden = false;
+    }
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; }
+};
+let replacementToken;
+async function replaceText(apply) {
+  const button = byId('replaceApply'), results = byId('replaceResults');
+  if (dirty()) { setNotice('Save or discard the open edit first.'); return; }
+  const body = {find:byId('replaceFrom').value, replace:byId('replaceTo').value,
+    case:byId('replaceCase').checked, whole:byId('replaceWhole').checked,
+    path:byId('path').value, scene:byId('scene').value, kind:byId('kind').value};
+  if (apply) body.token = replacementToken;
+  button.disabled = true;
+  byId('replacePreview').disabled = true;
+  results.hidden = false;
+  results.textContent = 'Checking replacements…';
+  try {
+    const data = await api('/replace', body);
+    if (apply) {
+      results.textContent = 'Approved ' + data.entries + ' changed entries.';
+      if (current) await openEntry(current.source.id);
+      else await loadList();
+    } else {
+      replacementToken = data.token;
+      button.disabled = !data.entries || !!data.invalid;
+      results.textContent = data.matches + ' matches in ' + data.entries + ' entries. ' +
+        data.invalid + ' invalid.\n\n' +
+        [...data.errors.map(([id,error]) => id + ': ' + error),
+         ...data.sample.map(([id,item]) => id + '\nBefore: ' + item.before + '\nAfter: ' + item.text)].join('\n\n');
+    }
+  } catch (error) { results.textContent = error.message; }
+  finally { byId('replacePreview').disabled = false; }
+}
+byId('replacePreview').onclick = () => replaceText(false);
+byId('replaceApply').onclick = () => replaceText(true);
+for (const id of ['replaceFrom','replaceTo','replaceCase','replaceWhole','path','scene','kind']) {
+  byId(id).addEventListener('input', () => { byId('replaceApply').disabled = true; });
+}
+Promise.all([api('/paths'), api('/settings'), api('/scenes')]).then(([paths, settings, scenes]) => {
+  portable = settings.portable;
+  byId('replacePanel').hidden = byId('short').disabled = portable;
+  for (const scene of scenes) byId('scene').append(new Option(scene.scene + ' · ' + scene.path, scene.id));
+  byId('approve').hidden = portable;
+  byId('graphicsTab').hidden = byId('extractTab').hidden = byId('buildTab').hidden = byId('livePreview').hidden = portable;
+  for (const path of paths) byId('path').append(new Option(path,path));
+  return loadList();
+}).catch(error => setNotice(error.message));
+</script>
+</html>
