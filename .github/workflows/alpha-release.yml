@@ -25,6 +25,7 @@ jobs:
         shell: pwsh
         run: |
           python -c "import gzip; from pathlib import Path; Path('english-catalogue.json').write_bytes(gzip.decompress(Path('editor/english-catalogue.json.gz').read_bytes()))"
+          New-Item -ItemType Directory -Path build -Force | Out-Null
           python tools/package_translation_editor.py --catalogue english-catalogue.json
       - name: Publish alpha prerelease
         shell: pwsh
