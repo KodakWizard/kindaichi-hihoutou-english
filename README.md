@@ -7,7 +7,7 @@
 <p align="center"><strong>v0.1.0-alpha</strong> · Sony PlayStation · Japanese release (SLPS-00601)</p>
 
 <p align="center">
-  <a href="patches/Kindaichi_Hihoutou_English_v0.1.0-alpha.bps?raw=true"><strong>Download the English Patch</strong></a>
+  <a href="https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.1.0-alpha/Kindaichi_Hihoutou_English_v0.1.0-alpha.bps"><strong>Download the English Patch</strong></a>
   &nbsp; · &nbsp;
   <a href="PATCHING_GUIDE.md">Installation Guide</a>
   &nbsp; · &nbsp;
@@ -26,13 +26,13 @@ The aim is to make the story and investigation playable in English while keeping
 
 You'll need your own clean Japanese copy of **SLPS-00601** in BIN/CUE format and a BPS patcher such as Floating IPS.
 
-1. Download the [English BPS patch](patches/Kindaichi_Hihoutou_English_v0.1.0-alpha.bps?raw=true).
+1. Download the [English BPS patch](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.1.0-alpha/Kindaichi_Hihoutou_English_v0.1.0-alpha.bps).
 2. Apply it to the clean Japanese BIN. See the [installation guide](PATCHING_GUIDE.md) for the CUE.
 3. Open the new CUE in your PlayStation emulator.
 
 ## Windows translation editor
 
-The portable editor opens the English dialogue and choices in a browser window. You can search, read scenes, save drafts and export edits. It is a separate download from the BPS game patch. Find the packaged EXE in [Releases](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases) when the alpha prerelease is available.
+The portable editor opens the English dialogue and choices in a browser window. You can search, read scenes, save drafts and export edits. It is a separate download from the BPS game patch. [Download the Windows editor ZIP](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.1.0-alpha/Kindaichi-English-Editor-v0.1.0-alpha.zip), extract it, and open `KindaichiTranslationEditor.exe`.
 
 ## Translation progress
 
