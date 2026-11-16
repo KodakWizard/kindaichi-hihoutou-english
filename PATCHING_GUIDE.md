@@ -2,14 +2,19 @@
 
 Use an unmodified Japanese BIN/CUE of **SLPS-00601**. Keep the original BIN and its CUE together. The supported clean BIN is 682,458,672 bytes and has SHA-1 `65f582ffe78b5fa55e45d0c163ba2e67a5b15e15`.
 
-## Windows
+## Apply the BPS patch
 
-Install Python 3.11 or later. In PowerShell, open the folder containing the patch and run this command, replacing the original CUE path with yours.
+1. Open a BPS patcher such as Floating IPS and choose **Apply Patch**.
+2. Select `Kindaichi_Hihoutou_English_v0.1.0-alpha.bps` and then the original Japanese **BIN**.
+3. Save the patched file as `Kindaichi-English.bin`.
+4. Copy the original CUE to `Kindaichi-English.cue`. Open the copy in a text editor and change only the filename on its `FILE` line.
 
-```powershell
-py -3 ".\Kindaichi_Hihoutou_English_v0.1.0-alpha.pyz" "D:\Games\Original.cue" ".\Kindaichi-English.bin"
+```cue
+FILE "Kindaichi-English.bin" BINARY
+  TRACK 01 MODE2/2352
+    INDEX 01 00:00:00
 ```
 
-On macOS or Linux, use `python3` with Python 3.11 or later and your own paths. The destination folder must already exist. The patcher checks both the input and the finished image. It creates a fresh BIN and CUE alongside one another and refuses existing output filenames.
+Keep the patched BIN and its CUE in the same folder. Open the English CUE for a fresh boot.
 
-Start the game by opening the English CUE. Use a fresh boot for testing. The earlier renderer and artwork checks were done piecemeal. Full route coverage and original hardware testing are still pending.
+The finished BIN SHA-256 is `162b6dd0a105ecfbe4d75f2f5c1da8bac1a0521a25291b35f915c4f8506be4b8`. Full route coverage and original hardware testing are still pending.

@@ -423,7 +423,11 @@ def main():
     if not args.db.is_file():
         parser.error("Database missing. Run python tools/translate_game.py rebuild")
     baseline = {}
-    if not args.portable:
+    if args.portable:
+        catalogue = args.db.with_name("english.json")
+        if catalogue.is_file():
+            baseline = json.loads(catalogue.read_text(encoding="utf-8"))
+    else:
         from editor_project import index
         baseline = index()
     with ThreadingHTTPServer(("127.0.0.1", args.port), Handler) as server:
@@ -444,3 +448,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
