@@ -4,6 +4,15 @@ The English beta is ready to try! This brings together the current story transla
 
 I'd love for more people to play it and help me find the things that still need polishing. If you enjoy detective games, I hope you'll have a good time with this one.
 
+## Translation progress
+
+| Story text | In English |
+| --- | --- |
+| Identified dialogue passages | **100%** — 6,858 passages |
+| Identified dialogue choices | **100%** — 790 choices |
+
+The maps, case notes, main evidence documents, torii verses and save/load labels have been translated too. Full playthrough testing is still in progress.
+
 ## Which download do I need?
 
 **To play:** download **[Kindaichi_Hihoutou_English_v0.9-beta-Patch.zip](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi_Hihoutou_English_v0.9-beta-Patch.zip)**. It contains the BPS patch, matching CUE and installation instructions. Use it with your own clean Japanese **SLPS-00601** BIN/CUE and a BPS patcher such as [Floating IPS](https://github.com/Sir-Walrus/Flips/releases).

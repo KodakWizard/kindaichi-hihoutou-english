@@ -9,6 +9,20 @@ The story and dialogue choices are translated, along with the maps, case notes, 
 
 This is **0.9 Beta**, and I'd love for people to give it a try. Enjoy the mystery, and let me know what needs another look.
 
+## What's translated?
+
+| Part of the game | Progress |
+| --- | --- |
+| Story dialogue | **100%** of identified passages — 6,858 in English |
+| Dialogue choices | **100%** of identified choices — 790 in English |
+| Maps and character introductions | Translated |
+| Case notes | All three days translated and revised |
+| Evidence documents | Licence, marriage forms, Written Pledge and timetable translated |
+| Torii verses | English added alongside the original Japanese and cipher symbols |
+| Save and load screens | English labels with matching lettering |
+
+The percentages refer to the dialogue and choices found in the script audit. Playthrough testing is still in progress.
+
 ## Getting started
 
 You'll need your own copy of the Japanese game, **SLPS-00601**, in BIN/CUE format.
