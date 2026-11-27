@@ -65,7 +65,8 @@ def build_archive(patch, name):
         rows = store.source_rows(db)
     selected, _ = read_patch(patch, rows)
     scripts, edits, errors = disc.plan(rows, selected, fill_lines=True,
-                                       baseline_windows=BASELINE_WINDOWS, expanded_choices=True)
+                                       baseline_windows=BASELINE_WINDOWS, expanded_choices=True,
+                                       extended_pagination=True, preserve_clue_literals=True)
     if errors:
         raise ValueError("\n".join(f"{key}: {error}" for key, error in sorted(errors.items())))
     prepare_graphics(scripts, edits, patch, rows)
@@ -180,7 +181,7 @@ def sheets():
         8, "/ATREN4/2_5_8.PAL", 0)
     for variant in (1, 2):
         path = f"/ETC/YASIKI{variant}.TXP"
-        groups[f"sheet:Manor floor plan {variant}"] = ([(path, 0), (path, 1)], 4, path, 0)
+        groups[f"sheet:Manor floor plan {variant}"] = ([(path, 0), (path, 1), (path, 2)], 4, path, 0)
     return groups
 
 
@@ -313,6 +314,28 @@ def graphics_info(path):
                 depth=int(depth), palette_path=palette_path, palette=first)
 
 
+def current_renderer(data):
+    """Apply the versioned renderer patch to its matching executable baseline."""
+    metrics = json.loads(disc.METRICS.read_text(encoding="utf-8"))
+    patch = metrics.get("renderer_patch")
+    if patch is None:
+        return data
+    digest = hashlib.sha1(data).hexdigest().upper()
+    if digest == metrics["renderer_sha1"]:
+        return data
+    if digest != patch["base_sha1"]:
+        raise ValueError("The executable does not match the measured punctuation baseline")
+    updated = bytearray(data)
+    for edit in patch["edits"]:
+        offset = edit["offset"]
+        if updated[offset] != edit["before"]:
+            raise ValueError(f"Unexpected executable byte at {offset:#x}")
+        updated[offset] = edit["after"]
+    if hashlib.sha1(updated).hexdigest().upper() != metrics["renderer_sha1"]:
+        raise ValueError("The punctuation executable does not match its measured metrics")
+    return bytes(updated)
+
+
 def prepare_graphics(scripts, edits, patch_path, rows):
     import graphics
     _, replacements = read_patch(patch_path, rows)
@@ -326,6 +349,8 @@ def prepare_graphics(scripts, edits, patch_path, rows):
                 continue
             before = disc.extent(baseline, record)
             after = disc.extent(latest, record)
+            if path == "/SLPS_006.01":
+                after = current_renderer(after)
             if path in replacements:
                 pages, _ = graphics.parse(after, Path(path).suffix)
                 after = bytearray(after)

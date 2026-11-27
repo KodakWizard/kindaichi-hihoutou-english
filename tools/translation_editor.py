@@ -99,7 +99,8 @@ def short_continuation(text):
 @lru_cache(maxsize=1)
 def wrap_metrics():
     import wrap
-    return wrap.Metrics("build/w_metrics_g4.json")
+    from translation_build import METRICS
+    return wrap.Metrics(METRICS)
 
 
 def listing(db, query):
@@ -171,7 +172,8 @@ def replace_text(db, baseline, data):
         if data.get("token") and data["token"] != token:
             raise ValueError("Matching entries changed. Preview again before applying.")
         _, _, errors = build.plan(rows, changes, fill_lines=True,
-                                   baseline_windows=BASELINE_WINDOWS, expanded_choices=True)
+                                   baseline_windows=BASELINE_WINDOWS, expanded_choices=True,
+                                   extended_pagination=True, preserve_clue_literals=True)
         for key, item in changes.items():
             if not item["text"]:
                 errors[key] = "Translation cannot be blank"
@@ -194,7 +196,8 @@ def preview(row, text):
     from repair_plamo_dialogue import BASELINE_WINDOWS
     key = row["id"]
     _, _, errors = build.plan({key: row}, {key: {"text": text}},
-                            fill_lines=True, baseline_windows=BASELINE_WINDOWS, expanded_choices=True)
+                            fill_lines=True, baseline_windows=BASELINE_WINDOWS, expanded_choices=True,
+                            extended_pagination=True, preserve_clue_literals=True)
     result = {"error": errors.get(key), "pages": []}
     if row["kind"] == "dialogue" and text.strip():
         try:
@@ -448,4 +451,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

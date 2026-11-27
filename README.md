@@ -1,66 +1,51 @@
-<p align="center"><strong>金田一少年の事件簿</strong><br>悲報島 新たなる惨劇</p>
+<h1 align="center">Kindaichi: Hihou-tou — English Fan Translation</h1>
 
-<h1 align="center">Kindaichi: Hihou-tou - English Fan Translation</h1>
+<p align="center"><strong>v0.2.0-beta.1</strong> · PlayStation · Japanese release SLPS-00601</p>
 
-<p align="center">Bringing the Japan-only PlayStation mystery into English.</p>
+**[Download the game patch](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.2.0-beta.1/Kindaichi_Hihoutou_English_v0.2.0-beta.1-Patch.zip)** · [Installation guide](PATCHING_GUIDE.md) · [Report a problem](https://github.com/KodakWizard/kindaichi-hihoutou-english/issues)
 
-<p align="center"><strong>v0.1.0-alpha</strong> · Sony PlayStation · Japanese release (SLPS-00601)</p>
+An English fan translation of *Kindaichi Shounen no Jikenbo — Hihou-tou Arata naru Sangeki*.
+This beta combines the current story translation, renderer fixes and approved graphics.
 
-<p align="center">
-  <a href="https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.1.0-alpha/Kindaichi_Hihoutou_English_v0.1.0-alpha.bps"><strong>Download the English Patch</strong></a>
-  &nbsp; · &nbsp;
-  <a href="PATCHING_GUIDE.md">Installation Guide</a>
-  &nbsp; · &nbsp;
-  <a href="https://github.com/KodakWizard/kindaichi-hihoutou-english/issues">Report a Problem</a>
-</p>
+## Play
 
----
+Download the game-patch ZIP above and apply its BPS to your clean Japanese **BIN**
+using [Floating IPS](https://github.com/Sir-Walrus/Flips/releases). Keep the patched
+BIN beside the included matching CUE, then load the CUE. The Workbench is optional;
+you do not need it or Python to patch the game.
 
-I've been working on an English patch for **Kindaichi Shounen no Jikenbo - Hihou-tou Arata naru Sangeki**, the Japan-only PlayStation mystery.
+## Optional Workbench
 
-The aim is to make the story and investigation playable in English while keeping the feel of the original. I've spent a lot of time getting the dialogue to fit, translating character captions and case notes, and cleaning up details like the save and load screens.
+[Download the Windows x64 Workbench](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.2.0-beta.1/Kindaichi-English-Workbench-v0.2.0-beta.1.zip) only if you want to
+review/edit the translation or build your own changes. Extract it to a short folder,
+open KindaichiEditor.exe and browse to your original BIN/CUE on first launch.
+The current 6,858 dialogue passages, 790 choices and approved graphics are included.
 
-**This is the first public alpha.** The identified story dialogue and choices have been translated. Some interface text and artwork still need work, and the game needs more testing across different routes.
+## Status
 
-## Getting started
-
-You'll need your own clean Japanese copy of **SLPS-00601** in BIN/CUE format and a BPS patcher such as Floating IPS.
-
-1. Download the [English BPS patch](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.1.0-alpha/Kindaichi_Hihoutou_English_v0.1.0-alpha.bps).
-2. Apply it to the clean Japanese BIN. See the [installation guide](PATCHING_GUIDE.md) for the CUE.
-3. Open the new CUE in your PlayStation emulator.
-
-## Windows translation editor
-
-The portable editor opens the English dialogue and choices in a browser window. You can search, read scenes, save drafts and export edits. It is a separate download from the BPS game patch. [Download the Windows editor ZIP](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.1.0-alpha/Kindaichi-English-Editor-v0.1.0-alpha.zip), extract it, and open `KindaichiTranslationEditor.exe`.
-
-## Translation progress
-
-| Area | Status |
+| Area | Beta status |
 | --- | --- |
-| Story dialogue | 6,852 identified entries in English |
-| Choices | 778 identified entries in English |
-| Character captions and case notes | Selected artwork translated |
-| Save and load screens | English labels and revised typography |
-| Playthroughs and original hardware | Further testing needed |
+| Identified active dialogue and choices | 6,858 passages and 790 choices; static coverage checked |
+| Evidence, notebook, torii and navigation graphics | Approved artwork integrated; gameplay checks pending |
+| Maps and character captions | Current translated artwork retained |
+| Opening/title art and credits | Intentionally original |
+| Movies | Original; Japanese inserts remain |
+| Full playthroughs, endings and original hardware | Not yet verified |
 
-## Found something that needs fixing?
+Long menus and new graphics need manual gameplay review. See [release notes](RELEASE_NOTES.md)
+for the consolidated changes and known testing gaps. A beta label does not mean all
+routes or endings have been completed in testing.
 
-If you spot some strange wording, text that gets cut off, or a graphic that looks wrong, [open an issue](https://github.com/KodakWizard/kindaichi-hihoutou-english/issues). A screenshot and a quick note about where it happened would be really helpful. Keep disc images and save files private.
+## Contribute
 
-## Project files and technical details
-
-<details>
-<summary><strong>Source files and translation tools</strong></summary>
-
-The [source guide](SOURCE_GUIDE.md) explains the patcher and the development tools included here.
-
-</details>
-
-## A note on AI
-
-I used PLaMo and ChatGPT for translation drafts, coding and troubleshooting. Getting the text to fit and the graphics to look right took a lot of back and forth, with manual checks and playable test builds along the way.
+Please include the beta version, scene, selected choice and a screenshot when
+[reporting a problem](https://github.com/KodakWizard/kindaichi-hihoutou-english/issues). Keep disc images private.
+The [source guide](SOURCE_GUIDE.md) describes the tools.
 
 ## Credits and licence
 
-This is an unofficial fan translation. The original game, characters, artwork and music belong to their respective owners. The project tools are available under the [MIT licence](tools/LICENSE). The translation is distributed as an alpha patch and requires a matching original disc.
+PLaMo and ChatGPT were used for translation drafts, tooling and troubleshooting,
+with human proofreading, artwork review and manual gameplay testing.
+This is an unofficial fan translation. The original game and its assets belong
+to their respective owners. Original project tools use the [MIT licence](LICENSE).
+Downloads contain patches and software, not a game image, BIOS or emulator.

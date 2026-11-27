@@ -93,9 +93,12 @@ CMD_START = (0x23, 0x24, 0x25, 0x5C)   # '# $ % \\ hand off to the command parse
 # same glyph in the same cell at the same position as the 0x8175 pair, but a CLAIMED byte
 # writes the pen's PREVH state and a pair does not, so the letter that follows the bracket no
 # longer inherits the right bearing of some unrelated glyph drawn earlier.  See PROGRESS.md.
-MARK_CODES = {'space': SPACE_CODE, 'q': 0x8148, 'open': 0x8165, 'brk': BRK_CODE}
-MARK = {'space': None, 'q': None, 'open': None, 'brk': None}   # raw byte, or None if unclaimed
-MARK_CHARS = {'?': 'q', '‘': 'open', BRK_GLYPH: 'brk'}   # source text -> marker (space via sp())
+MARK_CODES = {'space': SPACE_CODE, 'q': 0x8148, 'open': 0x8165, 'brk': BRK_CODE,
+              'colon': 0x8146, 'hyphen': 0x815D, 'apostrophe': 0x8166, 'semicolon': 0x8147}
+MARK = dict.fromkeys(MARK_CODES)   # raw byte, or None if unclaimed
+MARK_CHARS = {'?': 'q', '‘': 'open', BRK_GLYPH: 'brk', ':': 'colon', '-': 'hyphen',
+              '‐': 'hyphen', "'": 'apostrophe', '’': 'apostrophe'}
+MARK_CHARS[';'] = 'semicolon'
 
 
 def markers(M):
@@ -194,6 +197,11 @@ def encode(text, M):
                 # the 'brk' marker is 0x8175, the game's own 「, which the 2-byte pair path and
                 # Japanese text use legitimately.
                 if m['raw'] in [v for v in MARK.values() if v is not None]:
+                    alt = M.mark.get(ch)
+                    if alt is not None:
+                        p = M.pair(alt)
+                        toks.append(dict(t='pair', code=alt, L=p['L'], R=p['R'], src=ch))
+                        continue
                     raise ValueError('raw %r is a MARKER byte in this renderer (it draws SJIS '
                                      '%04X); write the intended character instead'
                                      % (ch, m['code']))
@@ -214,7 +222,38 @@ def encode(text, M):
         if p is None or not p['ink']:
             raise ValueError('%r -> SJIS %04X has no class row or no measured ink' % (ch, code))
         toks.append(dict(t='pair', code=code, L=p['L'], R=p['R'], src=ch))
-    return toks
+    # Pair glyphs leave PREVH unchanged. Add invisible, non-breaking blanks
+    # only when measured ink would otherwise touch the following compact glyph.
+    spaced = []
+    previous_p = M.pq[MARK['space']] >> 4 if MARK['space'] is not None else M.prevh_initial >> 4
+    compact_punctuation = MARK['colon'] is not None or MARK['hyphen'] is not None
+    for index, tk in enumerate(toks):
+        following = toks[index + 1].get('src', '') if index + 1 < len(toks) else ''
+        if tk.get('src') == "'" and following and '\u3400' <= following <= '\u9fff':
+            if MARK['open'] is not None:
+                opening = M.raw(MARK['open'])
+                tk.update(b=MARK['open'], code=opening['code'], L=opening['L'], R=opening['R'])
+            tk['opening_literal_quote'] = True
+        previous = spaced[-1].get('src', '') if spaced else ''
+        previous_pair = spaced[-1] if spaced and spaced[-1]['t'] == 'pair' else None
+        native_pair = bool(previous and '\u3400' <= previous <= '\u9fff')
+        long_bar = bool(previous_pair and previous_pair.get('code') == 0x815C)
+        if tk['t'] == 'raw':
+            if (previous_pair and previous_pair.get('R') is not None and tk.get('L') is not None
+                    and (compact_punctuation or native_pair or long_bar)):
+                distance = 0
+                while distance + previous_p + (M.pq[tk['b']] & 15) + tk['L'] <= previous_pair['R'] + 1:
+                    guard = sp()
+                    if guard['t'] == 'raw':
+                        distance += previous_p + (M.pq[guard['b']] & 15)
+                        previous_p = M.pq[guard['b']] >> 4
+                    else:
+                        distance += 16
+                    guard.update(src='', joining_blank=True)
+                    spaced.append(guard)
+            previous_p = M.pq[tk['b']] >> 4
+        spaced.append(tk)
+    return spaced
 
 
 # --------------------------------------------------------------------- pen arithmetic
@@ -273,13 +312,14 @@ def units_of(toks):
             elif hard:
                 hard[-1] = True
             continue
-        if tk.get('code') == SPACE_CODE:      # the pair space or a claimed marker space byte
+        if tk.get('code') == SPACE_CODE and not tk.get('joining_blank'):
             if cur or lead:
                 units.append(lead + cur)
                 lead, cur = [], []
                 hard.append(False)
             continue
-        if tk.get('src') in CLOSE_MARKS and not cur and units and not lead:
+        if (tk.get('src') in CLOSE_MARKS and not tk.get('opening_literal_quote')
+                and not cur and units and not lead):
             units[-1].append(tk)                    # glue back: never stranded at a line start
             continue
         if tk.get('src') in OPEN_MARKS and not cur and not lead:
@@ -542,7 +582,8 @@ def page_text(lines):
     return ' '.join(''.join(t['src'] for t in l if t['t'] != 'brk') for l in lines)
 
 
-MARK_SEMANTIC = {'space': ' ', 'q': '?', 'open': '\u2018', 'brk': '\u300c'}
+MARK_SEMANTIC = {'space': ' ', 'q': '?', 'open': '\u2018', 'brk': '\u300c',
+                 'colon': ':', 'hyphen': '-', 'apostrophe': "'", 'semicolon': ';'}
 
 
 def marker_unmap(s):

@@ -1,7 +1,16 @@
 # Source guide
 
-- `tools/clean_disc_patch.py` contains the standalone delta builder and applicator. Each distributed PYZ contains its own applicator and patch data.
-- `tools/translation_editor.py` and `tools/translation_editor.html` are the workbench interface. The supporting modules cover the database, build planner, layout and graphics.
-- `tools/patch_bin.py` and `tools/script_allocator.py` handle sector edits and script placement.
+The BPS game patch is independent of the optional Workbench. See PATCHING_GUIDE.md.
 
-The tools are published under the MIT licence. The workbench source is a development reference and expects additional local project modules, data, disc baselines and measurements. The alpha patch can be applied independently using the installation guide. Private workbench archives, extracted scripts, disc images, emulator binaries and BIOS files are kept in the development workspace.
+- `tools/build_bps_patch.py`: standard BPS1 creation and replay verification.
+- `tools/translation_editor.py` / `.html`: Workbench interface.
+- `tools/setup_public_workbench.py`: reconstruct local baselines/catalogue from a user's clean disc.
+- `tools/translation_source.py`: original source identification and conservative comment parsing.
+- `tools/translation_build.py`, `script_allocator.py`, `patch_bin.py`: build planning and disc changes.
+- `tools/wrap.py`, `choice_layout.py`: measured dialogue and choice layouts.
+- `tools/clean_disc_patch.py`: clean-disc deltas used by optional Workbench setup.
+
+The optional Workbench ZIP includes its runtime, source modules, English baseline,
+measurements, file metadata and setup deltas. It creates its local source database
+from the user's own disc. No private source database or extracted game assets are shipped.
+The repository tools are a development reference; disc images remain local.

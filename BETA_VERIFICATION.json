@@ -1,0 +1,12 @@
+{
+  "version": "v0.2.0-beta.1",
+  "status": "STATIC PASS; full gameplay pending",
+  "dialogue": 6858,
+  "choices": 790,
+  "scripts": 39,
+  "payload_files": 63,
+  "approved_artwork_instances": 17,
+  "target_sha256": "3f99713f312490f831329eb8e2a2f48b3a29942c869157e84f59a6ebe5454e13",
+  "independent_patcher": "Floating IPS v198",
+  "workbench": "Fresh setup, text catalogue, graphics preview and build planner checked"
+}

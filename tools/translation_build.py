@@ -12,17 +12,28 @@ from script_allocator import MAX_SECTORS, allocate, verify_extents
 
 BASE = Path("build/patched_dialogueCombined1.bin")
 BASE_SHA256 = "e24e6c6d95fbcbb36ef00a8909a902930a795ac452ec0acb236e9a2e696b544d"
+METRICS = next((path for path in (Path("build/w_metrics_release2.json"),
+                                Path("build/w_metrics_release1.json")) if path.exists()),
+               Path("build/w_metrics_g4.json"))
+CLUE_LITERALS = {
+    "/IN/OUBEYA.TXT@0000947a:dialogue": ("二七",),
+    "/IN/OUBEYA.TXT@00009bd4:dialogue": ("二七",),
+}
+CLUE_CODES = {int.from_bytes(char.encode("cp932"), "big")
+              for literals in CLUE_LITERALS.values() for literal in literals for char in literal}
 
 
-def validate_english(text):
+def validate_english(text, *, native_literals=()):
     if "\u300c" in text or "\u300d" in text:
         raise ValueError("Remove Japanese speech delimiters from English")
+    for literal in native_literals:
+        text = text.replace(literal, "")
     if re.search(r"[\u3040-\u30ff\u3400-\u9fff]", text):
         raise ValueError("Japanese glyphs in an approved English page")
 
 
-def render(text, metrics):
-    validate_english(text)
+def render(text, metrics, *, native_literals=()):
+    validate_english(text, native_literals=native_literals)
     lines, _ = wrap.pack(text.strip(), metrics, english_layout=True)
     if not lines:
         raise ValueError("Empty rendered page")
@@ -35,6 +46,12 @@ def render_lines(lines, metrics):
     if any(s["errors"] or s["lines"] > 3 or s["records"] > wrap.MAX_RECORDS
            or s["glyphs"] != states[0]["glyphs"] for s in states):
         raise ValueError("Page fails renderer simulation")
+    ink = [glyph for glyph in states[0]["glyphs"] if glyph[5] is not None]
+    for previous, following in zip(ink, ink[1:]):
+        if (previous[0] == following[0] and previous[3] == "pair"
+                and previous[4] in CLUE_CODES
+                and following[2] + following[5] <= previous[2] + previous[6]):
+            raise ValueError("A following glyph overlaps the protected native clue")
     return body
 
 
@@ -45,16 +62,16 @@ def page_words(lines):
 
 
 def dialogue_body(text, metrics, script, row, *, allow_pagination=True, fill_lines=False,
-                  min_extra_words=0):
-    """Use the verified key/name/msg pattern only at matching native key boundaries."""
+                  min_extra_words=0, extended_pagination=False, native_literals=()):
+    """Insert intermediate pages while preserving the original following commands."""
     if not allow_pagination:
         try:
-            return render(text, metrics)
+            return render(text, metrics, native_literals=native_literals)
         except ValueError as error:
             raise ValueError(f"Pagination disabled; single-page validation failed: {error}") from error
     offset = row["offset"]
     end = offset + row["size"]
-    validate_english(text)
+    validate_english(text, native_literals=native_literals)
     layout = [lines for lines, _ in wrap.paginate(text.strip(), metrics,
               english_layout=True, fill_lines=fill_lines)]
     for index in range(1, len(layout)):
@@ -72,19 +89,21 @@ def dialogue_body(text, metrics, script, row, *, allow_pagination=True, fill_lin
     if len(pages) == 1:
         return pages[0]
 
-    header = re.search(rb"(?:^|\r\n)([ \t]+)#name ([0-9]+)\r\n\1#msg\r\n\Z",
+    header = re.search(rb"(?:^|\r\n)([ \t]+)#name[ \t]+([0-9]+)[ \t]*\r\n\1#msg[ \t]*\r\n\Z",
                        script[max(0, offset - 128):offset])
     if header is None or int(header[2]) != row.get("speaker"):
         raise ValueError("Pagination requires a matching native #name/#msg header")
     indent = header[1]
     key = indent + b"#key\r\n"
-    if not script[end:].startswith(key):
+    if not extended_pagination and not script[end:].startswith(key):
         raise ValueError("Pagination requires a native #key immediately after the source page")
+    if extended_pagination and not script[end:].lstrip(b" \t\r\n").startswith((b"#", b"$", b"\\")):
+        raise ValueError("Extended pagination requires a verified following command boundary")
     transition = key + indent + b"#name " + header[2] + b"\r\n" + indent + b"#msg\r\n"
     return transition.join(pages)
 
 
-def choice_line(text, original, row, *, expanded=False):
+def choice_line(text, original, row, *, expanded=False, proportional=False, metrics=None):
     """Replace the label within the proven fixed-width menu format."""
     if expanded:
         match = re.fullmatch(rb"((?:[ \t]|\x81@)+%)([^\r\n]+)\r\n", original)
@@ -92,12 +111,19 @@ def choice_line(text, original, row, *, expanded=False):
             raise ValueError("Unrecognised choice record")
         prefix, source = match.groups()
         label = text.strip()
-        if not re.fullmatch(r"[A-Za-z0-9 .,!?():'%/+&-]+", label):
+        if not re.fullmatch(r"[A-Za-z0-9 .,!?():';%/+&-]+", label):
             raise ValueError("Unsupported English choice glyph")
-        encoded = "".join("\u3000" if c == " " else chr(ord(c) + 0xFEE0)
-                          for c in label).encode("cp932")
-        if source.startswith(b"\x81w") and source.endswith(b"\x81x"):
-            encoded = b"\x81w" + encoded + b"\x81x"
+        quoted = source.startswith(b"\x81w") and source.endswith(b"\x81x")
+        if proportional:
+            from choice_layout import encode
+            if metrics is None:
+                metrics = wrap.Metrics(METRICS)
+            encoded = encode(label, metrics)
+        else:
+            encoded = "".join("\u3000" if c == " " else chr(ord(c) + 0xFEE0)
+                              for c in label).encode("cp932")
+            if quoted:
+                encoded = b"\x81w" + encoded + b"\x81x"
         return prefix + encoded + b"\r\n"
     match = re.fullmatch(rb"([ \t]+%\x81w)(.+)(\x81x\r\n)", original)
     if match is None or row.get("choice_block") is None:
@@ -117,8 +143,11 @@ def choice_line(text, original, row, *, expanded=False):
 
 
 def plan(rows, approved, *, allow_expansion=True, allow_pagination=True, fill_lines=False,
-         min_extra_words=0, baseline_windows=None, expanded_choices=False):
-    metrics = wrap.Metrics("build/w_metrics_g4.json")
+         min_extra_words=0, baseline_windows=None, expanded_choices=False,
+         extended_pagination=False, preserve_clue_literals=False, proportional_choices=None):
+    metrics = wrap.Metrics(METRICS)
+    if proportional_choices is None:
+        proportional_choices = metrics.meta.get("proportional_choices", False)
     resources = inventory()
     scripts, edits, errors = {}, {}, {}
     growth = {}
@@ -141,7 +170,8 @@ def plan(rows, approved, *, allow_expansion=True, allow_pagination=True, fill_li
                 if not before.endswith(b"\r\n"):
                     raise ValueError("Page has no proven CRLF boundary")
                 if row["kind"] == "choice":
-                    body = choice_line(revision["text"], before, row, expanded=expanded_choices)
+                    body = choice_line(revision["text"], before, row, expanded=expanded_choices,
+                                       proportional=proportional_choices, metrics=metrics)
                     extra = max(0, len(body) - row["size"])
                     if extra and not allow_expansion:
                         raise ValueError("Choice expansion disabled")
@@ -149,9 +179,15 @@ def plan(rows, approved, *, allow_expansion=True, allow_pagination=True, fill_li
                         growth[path] = growth.get(path, 0) + extra
                     edits.setdefault(path, []).append((offset, end, body))
                     continue
+                literals = CLUE_LITERALS.get(key, ()) if preserve_clue_literals else ()
+                if any(literal not in row["jp"] for literal in literals):
+                    raise ValueError("The protected clue literal does not match its Japanese source")
+                if any(literal not in revision["text"] for literal in literals):
+                    raise ValueError("Keep the source clue characters unchanged: " + ", ".join(literals))
                 body = dialogue_body(revision["text"], metrics, scripts[path], row,
                                      allow_pagination=allow_pagination, fill_lines=fill_lines,
-                                     min_extra_words=min_extra_words)
+                                     min_extra_words=min_extra_words,
+                                     extended_pagination=extended_pagination, native_literals=literals)
                 extra = max(0, len(body) - row["size"])
                 if extra and not allow_expansion:
                     raise ValueError(

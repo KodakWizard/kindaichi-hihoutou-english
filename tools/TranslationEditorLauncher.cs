@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Forms;
 
 internal static class TranslationEditorLauncher
 {
+    [STAThread]
     private static int Main(string[] args)
     {
         try
@@ -48,6 +50,27 @@ internal static class TranslationEditorLauncher
                 Directory.CreateDirectory(output);
                 launch.EnvironmentVariables["KINDAICHI_EDITOR_OUTPUT"] = output;
                 launch.EnvironmentVariables["KINDAICHI_EDITOR_FROZEN_INDEX"] = "1";
+                string setup = Path.Combine(root, "tools", "setup_public_workbench.py");
+                string database = Path.Combine(root, "extract", "translation", "master.sqlite");
+                if (args.Length == 0 && File.Exists(setup) && !File.Exists(database))
+                {
+                    using (var picker = new OpenFileDialog())
+                    {
+                        picker.Title = "Select your clean Japanese SLPS-00601 disc";
+                        picker.Filter = "PlayStation disc images (*.cue;*.bin)|*.cue;*.bin";
+                        picker.CheckFileExists = true;
+                        if (picker.ShowDialog() != DialogResult.OK)
+                            return 0;
+                        launch.Arguments = "-B \"" + setup + "\" \"" + picker.FileName + "\"";
+                    }
+                    using (var initialization = Process.Start(launch))
+                    {
+                        initialization.WaitForExit();
+                        if (initialization.ExitCode != 0)
+                            throw new InvalidOperationException("Setup failed. Check the disc path and try again.");
+                    }
+                }
+
                 launch.Arguments = "-B \"" + script + "\"" +
                     (args.Length == 0 ? " --port 0 --open-browser" : " --help");
             }
