@@ -1,43 +1,35 @@
-# Kindaichi English v0.2.0-beta.1 — game patch
+# Installing Kindaichi 0.9 Beta
 
-You only need this download, your original game and a BPS patcher.
-The optional Workbench is a separate download for translation editing.
+You need your original Japanese game and the patch ZIP. The Workbench is a separate download for editing the translation; it isn't needed to play.
+
+## Before you start
+
+Use the Japanese PlayStation release **SLPS-00601** in BIN/CUE format. Keep your original files safe and apply this patch to a clean BIN, rather than to an earlier English patch.
 
 ## Apply the patch
 
-1. Extract this ZIP.
-2. Open Floating IPS: https://github.com/Sir-Walrus/Flips/releases
-3. Choose Apply Patch and select `Kindaichi_Hihoutou_English_v0.2.0-beta.1.bps`.
-4. Select your clean Japanese **BIN**, not its CUE.
-5. Save the result as `Kindaichi_Hihoutou_English_v0.2.0-beta.1.bin`.
-6. Keep that BIN beside the included `Kindaichi_Hihoutou_English_v0.2.0-beta.1.cue` and load the CUE to play.
+1. Extract **Kindaichi_Hihoutou_English_v0.9-beta-Patch.zip**.
+2. Open [Floating IPS](https://github.com/Sir-Walrus/Flips/releases) and choose **Apply Patch**.
+3. Select **Kindaichi_Hihoutou_English_v0.9-beta.bps**, then select your original Japanese **BIN** file.
+4. Save the new file as **Kindaichi_Hihoutou_English_v0.9-beta.bin**.
+5. Put it beside **Kindaichi_Hihoutou_English_v0.9-beta.cue**, which is included in the ZIP.
+6. Open the CUE in your PlayStation emulator to play.
 
-If you choose another output name, change the FILE line inside the CUE to match.
-Keep your original BIN/CUE unchanged. Apply this beta to the original disc,
-not to an earlier translation patch. No Python or Workbench is needed to play.
+If you give the patched BIN a different name, edit the `FILE` line in the CUE to match it. Both files need to stay together.
 
-## Supported original
+## Something didn't work?
 
-- Japanese PlayStation release SLPS-00601, single-track MODE2/2352 BIN/CUE.
-- Original BIN size: 682,458,672 bytes.
-- Original BIN SHA-1: `65f582ffe78b5fa55e45d0c163ba2e67a5b15e15`.
-- Patched BIN size: 683,994,528 bytes.
-- Patched BIN SHA-256: `3f99713f312490f831329eb8e2a2f48b3a29942c869157e84f59a6ebe5454e13`.
+If the patcher says the original file doesn't match, check that you selected the clean Japanese BIN for SLPS-00601. The CUE is the small text file used to load the finished game; apply the patch to the BIN.
 
-Floating IPS v198 independently applied this BPS and reproduced that output hash.
+If you're still stuck, [open an issue](https://github.com/KodakWizard/kindaichi-hihoutou-english/issues) and include the message you saw. Please don't upload your game image.
 
-## Beta status
+<details>
+<summary>File details and checksums</summary>
 
-Static checks cover 6,858 dialogue passages, 790 choices and 39 story scripts.
-The beta combines the current renderer fixes, recovered playable text, maps,
-captions, evidence graphics, corrected notebook notes, torii verses and save/load labels.
-All 17 new approved artwork instances match their previews in disc read-back.
+Original BIN: 682,458,672 bytes, SHA-1 `65f582ffe78b5fa55e45d0c163ba2e67a5b15e15`.
 
-Full start-to-finish route/ending and original-hardware testing are not complete.
-Long choice menus, new notebook/torii panel crops and save/load alignment need gameplay checks.
-Opening/title artwork and credits intentionally remain original. Movies remain unchanged;
-some Japanese inserts in them are not translated. Original puzzle symbols are preserved.
+Patched BIN: 683,994,528 bytes, SHA-256 `3f99713f312490f831329eb8e2a2f48b3a29942c869157e84f59a6ebe5454e13`.
 
-Report problems with a screenshot, scene, selected choice and beta version:
-https://github.com/KodakWizard/kindaichi-hihoutou-english/issues
-No game image, BIOS or emulator is included.
+The BPS has been applied and checked with Floating IPS v198.
+
+</details>

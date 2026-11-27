@@ -1,47 +1,44 @@
-# Kindaichi English v0.2.0-beta.1
+# Kindaichi English — 0.9 Beta
 
-One combined English beta for the Japanese PlayStation release SLPS-00601.
+The English beta is ready to try! This brings together the current story translation and the graphics we've been working through, from the case notes and evidence documents to the maps and save screens.
 
-## Play the game
+I'd love for more people to play it and help me find the things that still need polishing. If you enjoy detective games, I hope you'll have a good time with this one.
 
-Download **Kindaichi_Hihoutou_English_v0.2.0-beta.1-Patch.zip**. It contains the standard BPS patch, matching CUE,
-checksums and instructions. Apply the BPS to your original Japanese BIN with
-[Floating IPS](https://github.com/Sir-Walrus/Flips/releases). No Workbench or Python is required.
-The raw BPS and CUE are also attached separately.
+## Which download do I need?
 
-## Optional translation Workbench
+**To play:** download **[Kindaichi_Hihoutou_English_v0.9-beta-Patch.zip](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi_Hihoutou_English_v0.9-beta-Patch.zip)**. It contains the BPS patch, matching CUE and installation instructions. Use it with your own clean Japanese **SLPS-00601** BIN/CUE and a BPS patcher such as [Floating IPS](https://github.com/Sir-Walrus/Flips/releases).
 
-**Kindaichi-English-Workbench-v0.2.0-beta.1.zip** is a separate Windows x64 download for contributors.
-Extract it to a short folder, open KindaichiEditor.exe and browse to your own
-original BIN/CUE. It includes the current English text and graphics and can build edits.
-It is not required to apply the game patch.
+**To edit the translation:** the **[Kindaichi-English-Workbench-v0.9-beta.zip](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi-English-Workbench-v0.9-beta.zip)** is an optional Windows download. It lets you read and edit scenes, change graphics and build your own revisions. You don't need it to apply the game patch.
 
-## Included in this beta
+The raw BPS and CUE are also available below if you prefer those.
 
-- 6,858 identified dialogue passages and 790 choices, including 18 recovered playable records.
-- Existing proportional dialogue/choice and punctuation fixes; confirmed renderer retained.
-- Current map and character-caption work.
-- Approved redesigned licence, marriage forms, Written Pledge and investigation timetable,
-  including duplicate copies on the disc.
-- All six corrected Day 1–3 notebook pages in the approved uniform style.
-- Bilingual torii verses with original Japanese/cipher graphics preserved and quoted wording aligned.
-- Uniform 10px navigation/save/load lettering, including digits and date symbols.
+## What's in this version?
 
-## Validation and open testing
+- English story dialogue and choices, including conversations and options that were previously missed.
+- Translated maps and character introductions.
+- Redesigned evidence graphics: the driver's licence, marriage forms, Written Pledge and investigation timetable.
+- Revised case notes for all three days, with clearer headings and consistent lettering.
+- English torii verses alongside the original Japanese and cipher symbols.
+- Matching save/load labels and more work on text spacing and punctuation.
 
-Static verification passed for all 39 story scripts and 63 intended payload files.
-All 17 approved artwork instances match the final disc; source IDs, branches,
-protected 二七 clues, original title/credits and movies are preserved.
-Floating IPS v198 independently reproduced the exact beta BIN hash from the BPS.
-Optional Workbench setup reconstructs that same beta from the original disc.
+## What still needs a look?
 
-This is a prerelease: full route/ending and original-hardware tests remain open.
-111 long choice labels need visual wrap checks; one SYOKU_3 menu totals 205 glyph
-records against an inferred 192-record budget and needs gameplay review.
-New notebook/torii panel visibility and save/load alignment also need manual testing.
-Opening/title art and credits intentionally remain original. Unchanged movies include
-Japanese text inserts that are outside this completed graphics batch.
+This is a beta, and more testing is needed across the routes and endings. I'm particularly interested in long menus, the new notebook and evidence graphics, and anything that gets in the way of following the mystery. Original PlayStation hardware testing is also still to come.
 
-Supported original BIN SHA-1: `65f582ffe78b5fa55e45d0c163ba2e67a5b15e15` (682,458,672 bytes).
-Patched BIN SHA-256: `3f99713f312490f831329eb8e2a2f48b3a29942c869157e84f59a6ebe5454e13` (683,994,528 bytes).
-No game images, extracted original assets, emulator or BIOS are distributed.
+The title artwork and credits are staying original. Movies are unchanged too, so some Japanese text remains in them.
+
+If you spot a problem, [leave an issue here](https://github.com/KodakWizard/kindaichi-hihoutou-english/issues) with a screenshot and a quick description of where you were. If you make it through to an ending, please let me know — that feedback helps too.
+
+Thanks for giving it a try.
+
+<details>
+<summary>More detail for testers</summary>
+
+The build contains 6,858 dialogue passages and 790 choices across 39 story scripts. Disc checks and read-back of all 17 newly approved artwork instances passed. The BPS was also applied with Floating IPS and produced the expected game image.
+
+There are 111 long choice labels to check for wrapping. One menu in SYOKU_3 totals 205 glyph records against an inferred 192-record budget; whether that causes a problem needs a gameplay check. Notebook/torii panel crops, save/load alignment, complete routes and endings, and original hardware compatibility also remain open tests.
+
+Original BIN SHA-1: `65f582ffe78b5fa55e45d0c163ba2e67a5b15e15`.
+Patched BIN SHA-256: `3f99713f312490f831329eb8e2a2f48b3a29942c869157e84f59a6ebe5454e13`.
+
+</details>
