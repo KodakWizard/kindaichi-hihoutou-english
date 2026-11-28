@@ -14,3 +14,7 @@ The optional Workbench ZIP includes its runtime, source modules, English baselin
 measurements, file metadata and setup deltas. It creates its local source database
 from the user's own disc. No private source database or extracted game assets are shipped.
 The repository tools are a development reference; disc images remain local.
+
+## 1.0 movie subtitles
+
+`subtitles/` contains all 14 reviewed English SRTs and timing-origin notes. The stable game download is the standalone BPS in the 1.0 release. The optional 0.9 Workbench remains the earlier script/graphics editing tool; it does not reproduce the 1.0 movie changes. Native movie encoding and verification records are summarized in RELEASE_VERIFICATION_1.0.json. Original movie assets remain local.

@@ -1,53 +1,46 @@
-# Kindaichi English — 0.9 Beta
+# Kindaichi English — 1.0
 
-The English beta is ready to try! This brings together the current story translation and the graphics we've been working through, from the case notes and evidence documents to the maps and save screens.
+Version 1.0 is ready! This brings together the English story, choices and artwork with the reviewed movie subtitles. I hope you enjoy exploring Hihou Island and piecing together its mystery.
 
-I'd love for more people to play it and help me find the things that still need polishing. If you enjoy detective games, I hope you'll have a good time with this one.
+**[Download the 1.0 patch ZIP](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v1.0/Kindaichi_Hihoutou_English_v1.0-Patch.zip)** and apply it to your own original Japanese **SLPS-00601** BIN using [Floating IPS](https://github.com/Sir-Walrus/Flips/releases) or another BPS patcher. No Workbench or Python needed.
 
-## Translation progress
+## What's translated?
 
-| Story text | In English |
+| Part of the game | Progress |
 | --- | --- |
-| Identified dialogue passages | **100%** — 6,858 passages |
+| Identified story dialogue | **100%** — 6,858 passages |
 | Identified dialogue choices | **100%** — 790 choices |
+| Movie speech | **237 reviewed cues across 14 movies** |
+| Maps, case notes and main evidence documents | Translated |
+| Torii verses and save/load labels | Translated |
 
-The maps, case notes, main evidence documents, torii verses and save/load labels have been translated too. Full playthrough testing is still in progress.
+## New since 0.9 Beta
 
-## Which download do I need?
+- English movie subtitles, with manually reviewed wording and timings.
+- Previously missed movie dialogue restored, including DAI3.
+- Consistent white subtitle lettering with a thin black outline, keeping the original Japanese voices.
 
-**To play:** download **[Kindaichi_Hihoutou_English_v0.9-beta-Patch.zip](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi_Hihoutou_English_v0.9-beta-Patch.zip)**. It contains the BPS patch, matching CUE and installation instructions. Use it with your own clean Japanese **SLPS-00601** BIN/CUE and a BPS patcher such as [Floating IPS](https://github.com/Sir-Walrus/Flips/releases).
+The story translation, clue-preserving artwork and renderer improvements from 0.9 are included. Title artwork, credits and on-screen movie writing remain original by choice.
 
-**To edit the translation:** the **[Kindaichi-English-Workbench-v0.9-beta.zip](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi-English-Workbench-v0.9-beta.zip)** is an optional Windows download. It lets you read and edit scenes, change graphics and build your own revisions. You don't need it to apply the game patch.
+## Downloads
 
-The raw BPS and CUE are also available below if you prefer those.
+The **Patch ZIP** includes the BPS, matching CUE, instructions and checksums. The BPS and CUE are also available individually below. Apply the patch to a clean original BIN, rather than an earlier English build.
 
-## What's in this version?
+The optional [0.9 Workbench](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi-English-Workbench-v0.9-beta.zip) is still available separately for script and graphics editing; it has not been updated with the 1.0 movie build.
 
-- English story dialogue and choices, including conversations and options that were previously missed.
-- Translated maps and character introductions.
-- Redesigned evidence graphics: the driver's licence, marriage forms, Written Pledge and investigation timetable.
-- Revised case notes for all three days, with clearer headings and consistent lettering.
-- English torii verses alongside the original Japanese and cipher symbols.
-- Matching save/load labels and more work on text spacing and punctuation.
+## If you spot a problem
 
-## What still needs a look?
+Please [open an issue](https://github.com/KodakWizard/kindaichi-hihoutou-english/issues) with a screenshot, where it happened and the version you're playing. Reports from complete routes, endings and original PlayStation hardware are especially welcome.
 
-This is a beta, and more testing is needed across the routes and endings. I'm particularly interested in long menus, the new notebook and evidence graphics, and anything that gets in the way of following the mystery. Original PlayStation hardware testing is also still to come.
+The release build has been confirmed working in gameplay. All movie frames were decoded and checked, the original audio was preserved, and the standalone BPS was independently applied with Floating IPS to reproduce the verified image.
 
-The title artwork and credits are staying original. Movies are unchanged too, so some Japanese text remains in them.
-
-If you spot a problem, [leave an issue here](https://github.com/KodakWizard/kindaichi-hihoutou-english/issues) with a screenshot and a quick description of where you were. If you make it through to an ending, please let me know — that feedback helps too.
-
-Thanks for giving it a try.
+Thanks for playing!
 
 <details>
-<summary>More detail for testers</summary>
+<summary>Disc checksums</summary>
 
-The build contains 6,858 dialogue passages and 790 choices across 39 story scripts. Disc checks and read-back of all 17 newly approved artwork instances passed. The BPS was also applied with Floating IPS and produced the expected game image.
+Original BIN: 682,458,672 bytes; SHA-1 `65f582ffe78b5fa55e45d0c163ba2e67a5b15e15`.
 
-There are 111 long choice labels to check for wrapping. One menu in SYOKU_3 totals 205 glyph records against an inferred 192-record budget; whether that causes a problem needs a gameplay check. Notebook/torii panel crops, save/load alignment, complete routes and endings, and original hardware compatibility also remain open tests.
-
-Original BIN SHA-1: `65f582ffe78b5fa55e45d0c163ba2e67a5b15e15`.
-Patched BIN SHA-256: `3f99713f312490f831329eb8e2a2f48b3a29942c869157e84f59a6ebe5454e13`.
+Patched BIN: 683,994,528 bytes; SHA-256 `0b763ca624413a43c5c399a2f06ab60015a5d6a9f05b13f4f5c263a763600fdf`.
 
 </details>

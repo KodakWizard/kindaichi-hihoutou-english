@@ -1,0 +1,17 @@
+{
+  "build_sha256": "0b763ca624413a43c5c399a2f06ab60015a5d6a9f05b13f4f5c263a763600fdf",
+  "bps_sha256": "3260fb01c6e85093b414ce5ef36365e42491a6787d7f51460c6b17a1c5bae0c9",
+  "independent_patcher": "Floating IPS v198",
+  "independent_replay_sha256": "0b763ca624413a43c5c399a2f06ab60015a5d6a9f05b13f4f5c263a763600fdf",
+  "original_sha1_unchanged": "65f582ffe78b5fa55e45d0c163ba2e67a5b15e15",
+  "version": "1.0",
+  "dialogue": 6858,
+  "choices": 790,
+  "movies_subtitled": 14,
+  "subtitle_cues": 237,
+  "frames_decoded": 18429,
+  "xa_audio_sectors_unchanged": 23076,
+  "changed_video_sectors_edc_ecc_verified": 69084,
+  "user_confirmed_gameplay": true,
+  "exhaustive_routes_or_hardware_claimed": false
+}
