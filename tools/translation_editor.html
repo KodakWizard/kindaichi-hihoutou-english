@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kindaichi Translation Editor</title>
+<title>Kindaichi Workbench 1.0</title>
 <style>
 :root {color-scheme:dark; font:16px/1.5 Inter, "Segoe UI",sans-serif; background:#121519;color:#ece9df}
 * {box-sizing:border-box}
@@ -53,7 +53,7 @@ summary {cursor:pointer}
 a {color:#e5c484}
 @media(max-width:760px) {main,main.has-transcript {grid-template-columns:1fr} header,main {padding:14px} #entries {max-height:32vh}}
 </style>
-<header><h1>Kindaichi Translation Editor</h1><nav class="actions"><button id="textTab">Story &amp; choices</button><button id="graphicsTab">Graphics</button><button id="extractTab">Extract original disc</button><button id="buildTab">Build &amp; patch</button><a href="/drafts.jsonl" download="drafts.jsonl">Export drafts</a></nav></header>
+<header><h1>Kindaichi Workbench 1.0</h1><nav class="actions"><button id="textTab">Story &amp; choices</button><button id="graphicsTab">Graphics</button><button id="extractTab">Extract original disc</button><button id="buildTab">Build &amp; patch</button><a href="/drafts.jsonl" download="drafts.jsonl">Export drafts</a></nav></header>
 <main id="workspace">
 <aside id="textList">
   <h2>Entries</h2>
@@ -541,3 +541,4 @@ Promise.all([api('/paths'), api('/settings'), api('/scenes')]).then(([paths, set
 }).catch(error => setNotice(error.message));
 </script>
 </html>
+

@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 
 import wrap
+from movie_baseline import preserve_release_movies
 from patch_bin import edc_compute, patch
 from translation_source import SECTOR, extent, inventory
 from script_allocator import MAX_SECTORS, allocate, verify_extents
@@ -322,7 +323,9 @@ def build_image(scripts, edits, name):
         with candidate.open("rb") as image:
             verify_extents(image, relocated, expanded, records)
     verify_disc(candidate, expected, appended=appended)
+    preserve_release_movies(candidate)
     candidate.rename(output)
     with cue.open("xb") as file:
         file.write(cue_data.replace(BASE.name.encode(), output.name.encode()))
     return cue
+

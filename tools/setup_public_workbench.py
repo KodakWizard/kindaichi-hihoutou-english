@@ -28,7 +28,7 @@ def setup(selection):
             found, _ = scripts(record, extent(source, record))
             rows.extend(row for row in found if row["id"] in expected)
         if {row["id"] for row in rows} != set(expected):
-            raise ValueError("The original script catalogue does not match this alpha.")
+            raise ValueError("The original script catalogue does not match this Workbench release.")
         rows.extend(json.loads(Path("setup/speakers.json").read_text(encoding="utf-8")))
     with TemporaryDirectory(dir=".") as folder:
         temporary = Path(folder)

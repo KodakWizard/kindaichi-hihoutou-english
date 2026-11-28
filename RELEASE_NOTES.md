@@ -26,7 +26,7 @@ The story translation, clue-preserving artwork and renderer improvements from 0.
 
 The **Patch ZIP** includes the BPS, matching CUE, instructions and checksums. The BPS and CUE are also available individually below. Apply the patch to a clean original BIN, rather than an earlier English build.
 
-The optional [0.9 Workbench](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi-English-Workbench-v0.9-beta.zip) is still available separately for script and graphics editing; it has not been updated with the 1.0 movie build.
+For editing, download the separate **[Workbench 1.0](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v1.0/Kindaichi-English-Workbench-v1.0.zip)**. It includes the matching release baseline and reviewed subtitle files. Story and graphics rebuilds preserve all 237 movie subtitle cues. Fresh setup and an unmodified rebuild reproduce the exact released image.
 
 ## If you spot a problem
 

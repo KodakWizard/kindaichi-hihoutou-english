@@ -55,7 +55,7 @@ The current build has passed manual gameplay checks and file verification. Feedb
 
 ## Want to work on the translation?
 
-The separate [0.9 Windows Workbench](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v0.9-beta/Kindaichi-English-Workbench-v0.9-beta.zip) remains available for editing the beta's script and graphics. It is an older development tool; it does not include the reviewed 1.0 movie update. The [reviewed English subtitle files](subtitles/) are also available for contributors.
+The separate [Windows Workbench 1.0](https://github.com/KodakWizard/kindaichi-hihoutou-english/releases/download/v1.0/Kindaichi-English-Workbench-v1.0.zip) matches this release. Use it to read and edit scenes, change graphics and build your own revisions while keeping the reviewed movie subtitles. On first launch, browse to your original BIN/CUE to set it up. The [reviewed English subtitle files](subtitles/) are also included.
 
 If you just want to play, the game patch above is all you need.
 

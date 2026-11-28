@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "fresh_setup_exact": true,
+  "unmodified_rebuild_sha256": "0b763ca624413a43c5c399a2f06ab60015a5d6a9f05b13f4f5c263a763600fdf",
+  "edited_dialogue_applied": true,
+  "all_release_movies_preserved_after_edit": true,
+  "subtitle_cues": 237,
+  "movies": 14,
+  "english_entries": 7648,
+  "texture_catalogue": 280,
+  "navigation_png": true,
+  "packaged_runtime": true
+}
